@@ -18,7 +18,7 @@
         </div>
         <input class="edit" value="Create a TodoMVC template">
       </li>-->
-      <li *ngFor="let item of todos" [ngClass]="{'completed': item.done}">
+      <li *ngFor="let item of todos | filter : filterType" [ngClass]="{'completed': item.done}">
         <div class="view">
           <input class="toggle" type="checkbox" [(ngModel)]="item.done">
           <label>{{item.text | uppercase}}</label>
@@ -29,7 +29,9 @@
     </ul>
   </section>
   <!-- This footer should hidden by default and shown when there are todos -->
-  <app-footer *ngIf="todos.length > 0" [todos]="todos" (clearCompleted)="clearCompleted()"></app-footer>
+  <app-footer *ngIf="todos.length > 0" [todos]="todos"
+    (clearCompleted)="clearCompleted()"
+    (filterTypeChanged)="filterTypeChanged($event)"></app-footer>
 </section>
 <footer class="info">
   <p>Double-click to edit a todo</p>
