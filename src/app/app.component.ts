@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Http, RequestOptions, Headers } from '@angular/http';
-
-import { Observable } from 'rxjs';
+import { DataService } from "./data.service";
 
 @Component({
   selector: 'app-root',
@@ -14,38 +12,15 @@ export class AppComponent implements OnInit {
   todo = '';
   filterType = 'All';
   toggleAll = false;
-  private requestOptions = new RequestOptions({
-    headers: new Headers({
-      'authorization': 'token c4178561-abf7-4f8b-8afd-53bdea8ed2aa'
-    })
-  });
 
-  constructor (private http: Http) {
+  constructor (private dataSvc: DataService) {
 
   }
 
   ngOnInit() {
-    this.getTodos().subscribe(data => {
+    this.dataSvc.getTodos().subscribe(data => {
       this.todos = data;
     });
-  }
-
-  getTodos () {
-    return this.http.get('./me/todomvc', this.requestOptions).map(res => {
-      return res.json();
-    }).catch(error => {
-      console.log(error);
-      return Observable.of<any[]>([]);
-    });
-  }
-
-  saveTodos (newTodos: any[]) {
-    return this.http.post('./me/todomvc', newTodos, this.requestOptions).map(res => {
-      this.todos = res.json();
-    }).catch(error => {
-      console.log(error);
-      return Observable.of<any[]>([]);
-    })
   }
 
   addTodo () {
@@ -54,14 +29,17 @@ export class AppComponent implements OnInit {
       text: this.todo,
       done: false
     });
-    this.saveTodos(newTodos).subscribe(data => {
+    this.dataSvc.saveTodos(newTodos).subscribe(data => {
+      this.todos = data;
       this.todo = '';
     });
   }
 
   clearCompleted () {
     let newTodos = this.todos.filter(item => { return !item.done; });
-    this.saveTodos(newTodos).subscribe(data => {});
+    this.dataSvc.saveTodos(newTodos).subscribe(data => {
+      this.todos = data;
+    });
   }
 
   filterTypeChanged (filterType: string) {
@@ -73,17 +51,23 @@ export class AppComponent implements OnInit {
     newTodos.forEach(item => {
       item.done = value
     });
-    this.saveTodos(newTodos).subscribe(data => {});
+    this.dataSvc.saveTodos(newTodos).subscribe(data => {
+      this.todos = data;
+    });
   }
 
   updateToggleAllState () {
     this.toggleAll = this.todos.filter(item => { return !item.done; }).length === 0;
-    this.saveTodos(this.todos).subscribe(data => {});
+    this.dataSvc.saveTodos(this.todos).subscribe(data => {
+      this.todos = data;
+    });
   }
 
   removeTodo (todo) {
     let newTodos = [...this.todos];
     newTodos.splice(this.todos.indexOf(todo), 1);
-    this.saveTodos(newTodos).subscribe(data => {});
+    this.dataSvc.saveTodos(newTodos).subscribe(data => {
+      this.todos = data;
+    });
   }
 }
